@@ -30,18 +30,24 @@ parent_path = r"C:\AI Chalenge 2024\FINAL_Optimised\Keyframes_Optimized"  # Base
 
 if st.button("Search"):
     start = timer()
-    results = collection.query(query_texts=[query], n_results=10, include=["distances"])
+    results = collection.query(query_texts=[query], n_results=100, include=["distances"])
     print(results)
     
     for image_id, distance in zip(results['ids'][0], results['distances'][0]):
         # Combine the parent path with the relative path (image_id) to get the full path
-        image_path = os.path.join(parent_path, image_id)
-        
+        image_path = os.path.join(parent_path, image_id)        
         if os.path.exists(image_path):
             st.image(image_path, caption=os.path.basename(image_path))
             st.write(image_path)
             st.write(f"Distance: {distance}")
         else:
             st.write(f"File not found: {image_path}")
-    
+    st.write("All image path: ")
+    for image_id, distance in zip(results['ids'][0], results['distances'][0]):
+        image_path = os.path.join(parent_path, image_id)        
+        if os.path.exists(image_path):
+            st.write(image_path)
+            #st.write(f"Distance: {distance}")
+        else:
+            st.write(f"File not found: {image_path}")
     st.write(f"Time to process: {timer() - start}")
