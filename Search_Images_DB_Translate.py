@@ -1,4 +1,4 @@
-#streamlit run "D:/Gia_Projects/github.com/lephuckhanggia/AI_Search_Image/Search_Images_DB.py"
+#streamlit run "C:/AI Chalenge 2024/Search_Images_DB_Translate.py"
 import streamlit as st
 import chromadb
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
@@ -6,11 +6,14 @@ from chromadb.utils.data_loaders import ImageLoader
 import os
 import csv
 import pandas as pd
+from googletrans import Translator  # Use correct import from googletrans
+from translate import Translator as AltTranslator
+from langdetect import detect
 from timeit import default_timer as timer
 counter = 0
 counter2 = 0
 db_path = r"D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\DB_Full"  # Add your db path here
-output_excel_path = r'D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\Result\Result_Test6.xlsx'
+output_excel_path = r'D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\Result\Result_Test7.xlsx'
 csv_folder_path = r"C:\AI Chalenge 2024\Data 2024\Map_Keyframes\map-keyframes-b1\map-keyframes"  # Path to the CSV files
 parent_path = r"C:\AI Chalenge 2024\Data 2024\Keyframe"  # Base path to your image folder
 
@@ -32,14 +35,44 @@ st.image(banner_image_path, use_column_width=True)
 st.title("Image Search Engine")
 
 # Search bar
-query = st.text_input("Enter your search query:")
+text = st.text_input("Enter your search query:")
 
 # Initialize your data list outside the loop to collect all results
 all_data = []
 
+class Translation():
+    def __init__(self, from_lang='vi', to_lang='en', mode='google'):
+        # The class Translation is a wrapper for googletrans and translate libraries
+        self.__mode = mode
+        self.__from_lang = from_lang
+        self.__to_lang = to_lang
+
+        if mode == 'google':
+            self.translator = Translator()
+        elif mode == 'translate':
+            self.translator = AltTranslator(from_lang=from_lang, to_lang=to_lang)
+
+    def preprocessing(self, text):
+        return text.lower()
+
+    def __call__(self, text):
+        text = self.preprocessing(text)
+        if self.__mode == 'translate':
+            return self.translator.translate(text)
+        else:
+            return self.translator.translate(text, dest=self.__to_lang).text
+def text_search(text):
+    translater = Translation()  # Create an instance of the Translation class
+    if detect(text) == 'vi':  # If the detected language is Vietnamese
+        text = translater(text)  # Translate the text to English
+    return text  # Return the translated text
+
 if st.button("Search"):
     start = timer()
-    results = collection.query(query_texts=[query], n_results=100, include=["distances"])
+    
+    # Translate the text before processing
+    translated_text = text_search(text)  # Call the text search function
+    results = collection.query(query_texts=[translated_text], n_results=100, include=["distances"])
     
     for image_id, distance in zip(results['ids'][0], results['distances'][0]):
         # Combine the parent path with the relative path (image_id) to get the full path
@@ -97,7 +130,7 @@ if st.button("Search"):
     # After the loop, write all the collected data to an Excel file
     if all_data:
         df = pd.DataFrame(all_data)
-        df.to_csv(output_excel_path.replace('.xlsx', '.csv'), index=False, header=False)
+        df.to_csv(output_excel_path.replace('.xlsx', '.csv'), index=False)
         st.write(f"Data has been written to {output_excel_path.replace('.xlsx', '.csv')}")
 
     # Display time taken for the search
