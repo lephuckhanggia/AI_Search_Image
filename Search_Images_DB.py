@@ -9,7 +9,7 @@ import pandas as pd
 from timeit import default_timer as timer
 counter = 0
 db_path = r"D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\DB_Full"  # Add your db path here
-output_excel_path = r'D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\Result\Result_Test5.xlsx'
+output_excel_path = r'D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\Result\Result_Test6.xlsx'
 csv_folder_path = r"C:\AI Chalenge 2024\Data 2024\Map_Keyframes\map-keyframes-b1\map-keyframes"  # Path to the CSV files
 parent_path = r"C:\AI Chalenge 2024\Data 2024\Keyframe"  # Base path to your image folder
 
@@ -54,6 +54,7 @@ if st.button("Search"):
             with open(csv_file_path, 'r') as file:
                 csvreader = csv.reader(file)
                 header = next(csvreader)  # Skip the header row
+                
                 for row in csvreader:
                     row_num = int(row[0])
                     if row_num == filenum:  # Compare with the 'n' column
@@ -98,8 +99,8 @@ if st.button("Search"):
     # After the loop, write all the collected data to an Excel file
     if all_data:
         df = pd.DataFrame(all_data)
-        df.to_excel(output_excel_path, index=False)
-        st.write(f"Data has been written to {output_excel_path}")
+        df.to_csv(output_excel_path.replace('.xlsx', '.csv'), index=False)
+        st.write(f"Data has been written to {output_excel_path.replace('.xlsx', '.csv')}")
 
     # Display time taken for the search
     st.write(f"Time to process: {timer() - start}")
