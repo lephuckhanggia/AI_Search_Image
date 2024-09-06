@@ -1,4 +1,4 @@
-#streamlit run "C:/AI Chalenge 2024/Search_Images_DB_Translate.py"
+#streamlit run "D:/Gia_Projects/github.com/lephuckhanggia/AI_Search_Image/Search_Images_DB_Translate.py"
 import streamlit as st
 import chromadb
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
@@ -130,7 +130,7 @@ if st.button("Search"):
     # After the loop, write all the collected data to an Excel file
     if all_data:
         df = pd.DataFrame(all_data)
-        df.to_csv(output_excel_path.replace('.xlsx', '.csv'), index=False)
+        df.to_csv(output_excel_path.replace('.xlsx', '.csv'), index=False, header=False)
         st.write(f"Data has been written to {output_excel_path.replace('.xlsx', '.csv')}")
 
     # Display time taken for the search
