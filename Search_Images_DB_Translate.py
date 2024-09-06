@@ -29,7 +29,7 @@ collection = client.get_or_create_collection(
 )
 
 # Display the banner image
-banner_image_path = r"C:\AI Chalenge 2024\IMG_6447.JPG"  # Update with the path to your banner image
+banner_image_path = r"D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\Lucky_banner.jpg"  # Update with the path to your banner image
 st.image(banner_image_path, use_column_width=True)
 
 st.title("Image Search Engine")
