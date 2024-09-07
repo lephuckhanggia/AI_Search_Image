@@ -13,7 +13,7 @@ from timeit import default_timer as timer
 counter = 0
 counter2 = 0
 db_path = r"D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\DB_Full_2"  # Add your db path here
-output_excel_path = r'D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\Result\Submission_R0\query-1-kis.xlsx'
+output_excel_path = r'D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\Result\Submission_R0\query-2-kis.xlsx'
 csv_folder_path = r"C:\AI Chalenge 2024\Data 2024\Map_Keyframes\map-keyframes-b1\map-keyframes"  # Path to the CSV files
 parent_path = r"C:\AI Chalenge 2024\Data 2024\Keyframe"  # Base path to your image folder
 
