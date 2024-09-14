@@ -1,13 +1,13 @@
 import cv2
 
 # Path to the video
-video_path = r'C:\AI Chalenge 2024\Data 2024\Video_Full\Videos_L06_a\video\L06_V026.mp4'
+video_path = r'C:\AI Chalenge 2024\Data 2024\Video_Full\Videos_L11_a\video\L11_V020.mp4'
 
 # Open the video file
 cam = cv2.VideoCapture(video_path)
 
 # Set the time (in seconds) where you want to capture the frame
-capture_time = 895    # Time in seconds
+capture_time = 62   # Time in seconds
 
 # Get the FPS (frames per second) of the video
 fps = cam.get(cv2.CAP_PROP_FPS)

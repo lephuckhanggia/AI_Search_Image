@@ -10,12 +10,13 @@ from googletrans import Translator  # Use correct import from googletrans
 from translate import Translator as AltTranslator
 from langdetect import detect
 from timeit import default_timer as timer
+
 counter = 0
 counter2 = 0
 db_path = r"D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\DB_Full_2"  # Add your db path here
-output_excel_path = r'D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\Result\Submission_R0\query-2-kis.xlsx'
 csv_folder_path = r"C:\AI Chalenge 2024\Data 2024\Map_Keyframes\map-keyframes-b1\map-keyframes"  # Path to the CSV files
 parent_path = r"C:\AI Chalenge 2024\Data 2024\Keyframe"  # Base path to your image folder
+result_path = r'D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\Result'
 
 # Initialize Chroma DB client, embedding function, and data loader
 client = chromadb.PersistentClient(path=db_path)
@@ -29,13 +30,20 @@ collection = client.get_or_create_collection(
 )
 
 # Display the banner image
-banner_image_path = r"D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\Lucky_banner.jpg"  # Update with the path to your banner image
+banner_image_path = r"C:\AI Chalenge 2024\IMG_6447.JPG"  # Update with the path to your banner image
 st.image(banner_image_path, use_column_width=True)
 
 st.title("Image Search Engine")
 
 # Search bar
 text = st.text_input("Enter your search query:")
+
+# Get custom file name from the user
+file_name_input = st.text_input("Enter the desired file name (without extension):", "Result_Test")
+# Ensure the file name ends with .csv
+file_name = f"{file_name_input}.csv"
+# Define the output path based on user input
+output_csv_path = os.path.join(result_path, file_name)
 
 # Initialize your data list outside the loop to collect all results
 all_data = []
@@ -127,11 +135,11 @@ if st.button("Search"):
         else:
             st.write(f"File not found: {image_path}")
         
-    # After the loop, write all the collected data to an Excel file
+    # After the loop, write all the collected data to a new CSV file
     if all_data:
         df = pd.DataFrame(all_data)
-        df.to_csv(output_excel_path.replace('.xlsx', '.csv'), index=False, header=False)
-        st.write(f"Data has been written to {output_excel_path.replace('.xlsx', '.csv')}")
+        df.to_csv(output_csv_path, index=False, header=False)
+        st.write(f"Data has been written to {output_csv_path}")
 
     # Display time taken for the search
     st.write(f"Time to process: {timer() - start}")
