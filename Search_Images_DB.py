@@ -10,10 +10,10 @@ from timeit import default_timer as timer
 
 counter = 0
 counter2 = 0
-db_path = r"D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\DB_Full_2"  # Add your db path here
-csv_folder_path = r"C:\AI Chalenge 2024\Data 2024\Map_Keyframes\map-keyframes-b1\map-keyframes"  # Path to the CSV files
-parent_path = r"C:\AI Chalenge 2024\Data 2024\Keyframe"  # Base path to your image folder
-result_path = r'D:\Gia_Projects\github.com\lephuckhanggia\AI_Search_Image\Result'
+db_path = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Round_3\DB_0.01_L022"  # Add your db path here
+csv_folder_path = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Round_3\CSV_0.1"  # Path to the CSV files
+parent_path = r"C:\AI Chalenge 2024\Data 2024\KeyFrames_0.1"  # Base path to your image folder
+result_path = r'D:\LePhucKhangGia\AI_Chanllenge_2024\AI_Search_Image\Result'
 
 # Initialize Chroma DB client, embedding function, and data loader
 client = chromadb.PersistentClient(path=db_path)
