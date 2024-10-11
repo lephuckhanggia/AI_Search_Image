@@ -1,4 +1,4 @@
-#streamlit run "D:/Gia_Projects/github.com/lephuckhanggia/AI_Search_Image/Search_Images_DB.py"
+#streamlit run "D:/LePhucKhangGia/AI_Chanllenge_2024/AI_Search_Image/Search_Images_DB.py"
 import streamlit as st
 import chromadb
 from chromadb.utils.embedding_functions import OpenCLIPEmbeddingFunction
@@ -68,7 +68,7 @@ if st.button("Search"):
                     row_num = int(row[0])
                     if row_num == filenum:  # Compare with the 'n' column
                         print(f'Matching row: {row}')
-                        frame_idx_value = row[3]
+                        frame_idx_value = row[2]
 
                         # Append the values to the data list
                         data.append({
