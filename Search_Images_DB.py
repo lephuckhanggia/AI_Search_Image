@@ -55,16 +55,7 @@ st.title("Image Search Engine")
 DB_select = st.selectbox("Choose DB set you want:", options=DB_List)
 
 # Update db_path based on selection
-if DB_select == DB_FULL_FINAL:
-    db_path = DB_FULL_FINAL
-elif DB_select == DB_L01_L22:
-    db_path = DB_L01_L22
-elif DB_select == DB_L23_L24:
-    db_path = DB_L23_L24
-elif DB_select == DB_L25:
-    db_path = DB_L25
-elif DB_select == DB_L26:
-    db_path = DB_L26
+db_path = DB_select  # Simplified assignment
 
 # Input search query and custom file name at the top
 query = st.text_input("Enter your search query:")
@@ -152,29 +143,29 @@ if results:
 
     # Display time taken for the search
     st.write(f"Time to process: {timer() - start}")
-with list_image_col:
-    if st.button("Show Checkbox Values"):
-        # Prepare data for the DataFrame
-        checkbox_data = []
 
-        for checkbox_key, checked in st.session_state.checkbox_states.items():
-            icon = "✅" if checked else "❌"
-            checkbox_data.append({"Checkbox": checkbox_key, "Status": icon})
+    with list_image_col:  # Moved inside the results check
+        if st.button("Show Checkbox Values"):
+            # Prepare data for the DataFrame
+            checkbox_data = []
 
-        # Create a DataFrame
-        df = pd.DataFrame(checkbox_data)
+            for checkbox_key, checked in st.session_state.checkbox_states.items():
+                icon = "✅" if checked else "❌"
+                checkbox_data.append({"Checkbox": checkbox_key, "Status": icon})
 
-        # Use a separate column for displaying the checkbox values
-        with list_image_col:
+            # Create a DataFrame
+            df = pd.DataFrame(checkbox_data)
+
+            # Use a separate column for displaying the checkbox values
             st.write("Checked Values:")
             st.dataframe(df.style.set_table_attributes('style="width: 100%; white-space: nowrap;"'), height=800)  # Display the DataFrame as a table
 
-    st.write("All image paths: ")
-    counter = 0
-    for image_id, distance in zip(results['ids'][0], results['distances'][0]):
-        image_path = os.path.join(parent_path, image_id)
-        if os.path.exists(image_path):
-            counter += 1
-            st.write(counter, image_id)
-        else:
-            st.write(f"File not found: {image_path}")
+        st.write("All image paths: ")
+        counter = 0
+        for image_id, distance in zip(results['ids'][0], results['distances'][0]):
+            image_path = os.path.join(parent_path, image_id)
+            if os.path.exists(image_path):
+                counter += 1
+                st.write(counter, image_id)
+            else:
+                st.write(f"File not found: {image_path}")

@@ -11,10 +11,10 @@ import traceback
 
 start = timer()
 
-image_folder_path = r"C:\AI Chalenge 2024\Data 2024\KeyFrames_L01_L022"  # add your folder path here
+image_folder_path = r"C:\AI Chalenge 2024\Data 2024\KeyFrames_0.1"  # add your folder path here
 image_files = glob.glob(os.path.join(image_folder_path, '**', '*.jpg'), recursive=True)
 
-db_path = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\DB_L01_L22"  # add your db path here
+db_path = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\DB_FULL_FINAL"  # add your db path here
 
 # Initialize Chroma DB client, embedding function, and data loader
 client = chromadb.PersistentClient(path=db_path)
