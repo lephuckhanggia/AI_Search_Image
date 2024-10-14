@@ -8,8 +8,6 @@ import pandas as pd
 from timeit import default_timer as timer
 
 # Initialize variables
-counter = 0
-counter2 = 0
 db_path = 0
 
 # Define DB paths
@@ -30,7 +28,7 @@ st.markdown(
     <style>
     /* Adjust the width of the main content area */
     .main .block-container {
-        min-width: 5000px; /* Force the content to stretch */
+        min-width: 1200px; /* Force the content to stretch */
         padding-left: 10px;  /* Optional: Add some padding */
         padding-right: 10px; /* Optional: Add some padding */
     }
@@ -39,10 +37,13 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
 # Set up session state for checkbox persistence
 if "checkbox_states" not in st.session_state:
     st.session_state.checkbox_states = {}
+
+# Store search results in session state to persist across interactions
+if "search_results" not in st.session_state:
+    st.session_state.search_results = None
 
 # Display the banner image
 banner_image_path = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Team_Photos\I MISS HER BANNER.png"
@@ -50,7 +51,7 @@ st.image(banner_image_path, use_column_width=True)
 
 st.title("Image Search Engine")
 
-# Select the DB set
+# Place DB selector, query input, file name input, and search button at the top
 DB_select = st.selectbox("Choose DB set you want:", options=DB_List)
 
 # Update db_path based on selection
@@ -65,36 +66,41 @@ elif DB_select == DB_L25:
 elif DB_select == DB_L26:
     db_path = DB_L26
 
-# Initialize Chroma DB client, embedding function, and data loader
-client = chromadb.PersistentClient(path=db_path)
-embedding_function = OpenCLIPEmbeddingFunction()
-data_loader = ImageLoader()
-
-collection = client.get_or_create_collection(
-    name='multimodal_collection3',
-    embedding_function=embedding_function,
-    data_loader=data_loader
-)
-
-# Input search query
+# Input search query and custom file name at the top
 query = st.text_input("Enter your search query:")
-
-# Get custom file name from the user
 file_name_input = st.text_input("Enter the desired file name (without extension):", "Result_Test")
 file_name = f"{file_name_input}.csv"
 output_csv_path = os.path.join(result_path, file_name)
-
-# Containers for layout stability
-image_col_container = st.container()
-list_image_col_container = st.container()
-
-# If search button is clicked
+start = timer()
+# Place the Search button at the top of the page
 if st.button("Search"):
-    start = timer()
+    # Start timer and perform search query
+
+    client = chromadb.PersistentClient(path=db_path)
+    embedding_function = OpenCLIPEmbeddingFunction()
+    data_loader = ImageLoader()
+
+    collection = client.get_or_create_collection(
+        name='multimodal_collection3',
+        embedding_function=embedding_function,
+        data_loader=data_loader
+    )
+
     results = collection.query(query_texts=[query], n_results=100, include=["distances"])
 
+    # Store the results in session state
+    st.session_state.search_results = results
+    st.session_state.checkbox_states = {}  # Reset checkbox states after new search
+
+# Retrieve stored search results if available
+results = st.session_state.search_results
+
+if results:
     all_data = []
-    check_vars = {}
+
+    # Containers for layout stability
+    image_col_container = st.container()
+    list_image_col_container = st.container()
 
     with image_col_container:
         # Columns for image and list display
@@ -119,34 +125,23 @@ if st.button("Search"):
                             data.append({'directory': directory_name, 'frameid': frame_idx_value})
                             break
 
-            counter2 += 1
             if data:
                 all_data.extend(data)
 
             with image_col:
                 if os.path.exists(image_path):
                     st.image(image_path, caption=os.path.basename(image_path))
-                    st.write(counter2, image_path)
-
+                    st.write(idx + 1, image_id)
                     # Use session state for the checkbox
-                    checkbox_key = f"checkbox_{counter2}"
+                    checkbox_key = f"checkbox_{idx + 1}"
                     if checkbox_key not in st.session_state.checkbox_states:
                         st.session_state.checkbox_states[checkbox_key] = False  # Default value
 
                     # Checkbox and save the state
                     st.session_state.checkbox_states[checkbox_key] = st.checkbox(
-                        f"{counter2} Correct", value=st.session_state.checkbox_states[checkbox_key]
+                        f"{idx + 1} Correct", value=st.session_state.checkbox_states[checkbox_key]
                     )
 
-                else:
-                    st.write(f"File not found: {image_path}")
-
-        with list_image_col:
-            st.write("All image paths: ")
-            for image_id, distance in zip(results['ids'][0], results['distances'][0]):
-                if os.path.exists(image_path):
-                    counter += 1
-                    st.write(counter, image_id)
                 else:
                     st.write(f"File not found: {image_path}")
 
@@ -157,3 +152,29 @@ if st.button("Search"):
 
     # Display time taken for the search
     st.write(f"Time to process: {timer() - start}")
+with list_image_col:
+    if st.button("Show Checkbox Values"):
+        # Prepare data for the DataFrame
+        checkbox_data = []
+
+        for checkbox_key, checked in st.session_state.checkbox_states.items():
+            icon = "✅" if checked else "❌"  # Use checkmark for checked and cross for unchecked
+            checkbox_data.append({"Checkbox": checkbox_key, "Status": icon})
+
+        # Create a DataFrame
+        df = pd.DataFrame(checkbox_data)
+
+        # Use a separate column for displaying the checkbox values
+        with list_image_col:
+            st.write("Checked Values:")
+            st.dataframe(df.style.set_table_attributes('style="width: 100%; white-space: nowrap;"'), height=800)  # Display the DataFrame as a table
+
+    st.write("All image paths: ")
+    counter = 0
+    for image_id, distance in zip(results['ids'][0], results['distances'][0]):
+        image_path = os.path.join(parent_path, image_id)
+        if os.path.exists(image_path):
+            counter += 1
+            st.write(counter, image_id)
+        else:
+            st.write(f"File not found: {image_path}")
