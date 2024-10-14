@@ -158,7 +158,7 @@ with list_image_col:
         checkbox_data = []
 
         for checkbox_key, checked in st.session_state.checkbox_states.items():
-            icon = "✅" if checked else "❌"  # Use checkmark for checked and cross for unchecked
+            icon = "✅" if checked else "❌"
             checkbox_data.append({"Checkbox": checkbox_key, "Status": icon})
 
         # Create a DataFrame
