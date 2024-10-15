@@ -13,10 +13,15 @@ db_path = 0
 # Define DB paths
 DB_FULL_FINAL = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\DB_FULL_FINAL"
 DB_L01_L22 = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\DB_L01_L22"
-DB_L23_L24 = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\DB_L23_L24"
+DB_L23 = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\DB_L23"
+DB_L24 = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\DB_L24"
 DB_L25 = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\DB_L25"
 DB_L26 = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\DB_L26"
-DB_List = [DB_FULL_FINAL, DB_L01_L22, DB_L23_L24, DB_L25, DB_L26]
+DB_L27 = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\DB_L27"
+DB_L28 = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\DB_L28"
+DB_L29 = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\DB_L29"
+DB_L30 = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\DB_L30"
+DB_List = [DB_FULL_FINAL, DB_L01_L22, DB_L23, DB_L25, DB_L26, DB_L27, DB_L28, DB_L29, DB_L30]
 
 csv_folder_path = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\CSV_0.1"
 parent_path = r"C:\AI Chalenge 2024\Data 2024\KeyFrames_0.1"
@@ -112,8 +117,9 @@ if results:
                     for row in csvreader:
                         row_num = int(row[0])
                         if row_num == filenum:
-                            frame_idx_value = row[2]
-                            data.append({'directory': directory_name, 'frameid': frame_idx_value})
+                            time_value_sec = row[1]
+                            time_value_mili = time_value_sec * 1000
+                            data.append({'directory': directory_name, 'time(ms)': time_value_mili})
                             break
 
             if data:
