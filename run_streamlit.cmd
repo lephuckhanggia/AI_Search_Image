@@ -1,1 +1,1 @@
-streamlit run Search_Images_DB.py
+streamlit run Search_Images_API_Submit_.py
