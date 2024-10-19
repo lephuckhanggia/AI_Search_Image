@@ -171,11 +171,11 @@ with st.sidebar:
             else:
                 st.write(f"Failed to submit QA answer, status code: {response.status_code}")
                 st.write(response.text)
-        st.write(QA_Answer_Structure)
-        st.write(Video_Answer)
-        st.write(Time_ms_Answer)
-        st.write("Submitting the following body:")
-        st.write(body)
+        st.write('QA_Answer_Structure:  ',QA_Answer_Structure)
+        st.write("Video_Answer:  ",Video_Answer)
+        st.write("Time_ms_Answer:  ",Time_ms_Answer)
+        st.write("Submitting the following body:", body)
+
 
 # Retrieve stored search results if available
 results = st.session_state.search_results
