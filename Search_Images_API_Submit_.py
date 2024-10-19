@@ -7,6 +7,7 @@ import csv
 import pandas as pd
 from timeit import default_timer as timer
 import requests
+from streamlit import image
 
 # Initialize variables
 db_path = 0
@@ -71,6 +72,8 @@ with st.sidebar:
     # Input search query and custom file name at the top
     query = st.text_input("Enter your search query:")
     file_name_input = st.text_input("Enter the desired file name (without extension):", "Result_Test")
+    nearby_img_range_input = st.text_input("Nearby Images range:","5")
+    nearby_img_range = int(nearby_img_range_input)
     file_name = f"{file_name_input}.csv"
     output_csv_path = os.path.join(result_path, file_name)
     start = timer()
@@ -101,7 +104,7 @@ with st.sidebar:
     def submit_kis_answer():
         response = requests.post(url, params=params, json=body_KIS)
         return response
-
+    st.title("Submission")
     Video_Answer = st.text_input("Video name:")
     Time_ms_Answer = st.text_input("Time in ms: ")
     QA_Answer = st.text_input("QA Ansewer:")
@@ -120,8 +123,8 @@ with st.sidebar:
                 "answers": [
                     {
                         "mediaItemName": Video_Answer,  # Replace with the video ID without the file extension
-                        "start": int(Time_ms_Answer),  # Replace with the start time in milliseconds
-                        "end": int(Time_ms_Answer)  # Replace with the end time in milliseconds
+                        "start":Time_ms_Answer,  # Replace with the start time in milliseconds
+                        "end": Time_ms_Answer  # Replace with the end time in milliseconds
                     }
                 ]
             }
@@ -179,6 +182,8 @@ if results:
 
         for idx, (image_id, distance) in enumerate(zip(results['ids'][0], results['distances'][0])):
             image_path = os.path.join(parent_path, image_id)
+            image_num = os.path.splitext(os.path.basename(image_path))[0]
+            video_name = os.path.basename(os.path.dirname(image_id))
             filename_without_extension, _ = os.path.splitext(os.path.basename(image_path))
             filenum = int(filename_without_extension)
             directory_name = os.path.basename(os.path.dirname(image_path))
@@ -192,8 +197,8 @@ if results:
                     for row in csvreader:
                         row_num = int(row[0])
                         if row_num == filenum:
-                            time_value_sec = float(row[1])
-                            time_value_mili = time_value_sec * 1000
+                            time_value_sec = round(float(row[1]),2)
+                            time_value_mili = int(time_value_sec * 1000)
                             data.append({'directory': directory_name, 'time(ms)': time_value_mili})
                             break
 
@@ -203,19 +208,92 @@ if results:
             with image_col:
                 if os.path.exists(image_path):
                     st.image(image_path, caption=os.path.basename(image_path))
-                    st.write(idx + 1, image_id,'Time: ', time_value_mili)
-                    # Use session state for the checkbox
-                    checkbox_key = f"checkbox_{idx + 1}"
-                    if checkbox_key not in st.session_state.checkbox_states:
-                        st.session_state.checkbox_states[checkbox_key] = False  # Default value
+                    col_1, col_2,col_3 = st.columns([0.4, 0.3,0.2])
 
-                    # Checkbox and save the state
-                    st.session_state.checkbox_states[checkbox_key] = st.checkbox(
-                        f"{idx + 1} Correct", value=st.session_state.checkbox_states[checkbox_key]
-                    )
+                    with col_1:
+                        st.write(idx + 1,  "Num: ",image_num)
+                        st.write(f'Name: {video_name}')
+                        st.write("Time: ",time_value_mili)
+                        checkbox_key = f"checkbox_{idx + 1}"
+                        if checkbox_key not in st.session_state.checkbox_states:
+                            st.session_state.checkbox_states[checkbox_key] = False  # Default value
 
-                else:
-                    st.write(f"File not found: {image_path}")
+                        st.session_state.checkbox_states[checkbox_key] = st.checkbox(
+                            f"{idx + 1} Correct", value=st.session_state.checkbox_states[checkbox_key]
+                        )
+
+                    with col_2:
+                        # Create a button with a unique key for each image
+                        if st.button(f"Nearby Images {idx + 1}", key=f"nearby_button_{idx + 1}"):
+                            # Initialize the nearby_image_paths list
+                            nearby_image_paths = []
+
+                            # Extract the image number and find nearby images
+                            filename = os.path.basename(image_id)
+                            number_part = os.path.splitext(filename)[0]
+                            last_number = int(number_part)
+                            nearby_numbers = list(range(last_number - nearby_img_range, last_number + nearby_img_range + 1))
+
+                            # Store the nearby image paths
+                            for num in nearby_numbers:
+                                # Find time value for nearby images
+                                nearby_image_filename = f"{num}.jpg"
+                                nearby_image_path = os.path.join(os.path.dirname(image_path), nearby_image_filename)
+
+                                # Get the directory name for the nearby image
+                                directory_name_nearby_img = os.path.basename(os.path.dirname(nearby_image_path))
+
+                                # Construct the CSV file path for the nearby image
+                                csv_file_path_nearby_img = os.path.join(csv_folder_path,
+                                                                        f'{directory_name_nearby_img}.csv')
+
+                                # Check if the CSV file exists
+                                if os.path.exists(csv_file_path_nearby_img):
+                                    with open(csv_file_path_nearby_img, 'r') as file:
+                                        csvreader = csv.reader(file)
+                                        header = next(csvreader)  # Skip header row
+                                        for row in csvreader:
+                                            row_num = int(row[0])
+                                            if row_num == num:  # Use `num` to match the nearby image number
+                                                time_value_sec_nearby_img = float(row[1])
+                                                time_value_mili_nearby_img = int(time_value_sec_nearby_img * 1000)
+                                                break
+
+                                # Create the full path for the nearby image by keeping the same directory
+                                if os.path.exists(nearby_image_path):
+                                    nearby_image_paths.append((nearby_image_path, time_value_mili_nearby_img))  # Add to list with time
+                                else:
+                                    st.write(f"File not found: {nearby_image_path}")
+
+                            # Save the results in session state to persist them across refreshes
+                            st.session_state.nearby_images = nearby_image_paths  # Now this will work
+
+                            # Split the nearby_image_paths into two halves
+                            midpoint = len(nearby_image_paths) // 2
+                            first_half = nearby_image_paths[:midpoint]
+                            second_half = nearby_image_paths[midpoint:]
+
+                            # Display the first half of nearby images in col_1
+                            with col_1:
+                                for img_path, img_time in first_half:
+                                    image_number = os.path.splitext(os.path.basename(img_path))[0]  # Get the filename without extension
+                                    st.image(img_path)  # Display the image
+                                    st.write(f"Nearby image: {image_number}")  # Display the full path
+                                    st.write("Time: ", img_time)  # Display the time
+
+                            # Display the second half of nearby images in col_2
+                            with col_2:
+                                for img_path, img_time in second_half:
+                                    image_number = os.path.splitext(os.path.basename(img_path))[0]  # Get the filename without extension
+                                    st.image(img_path)  # Display the image
+                                    st.write(f"Nearby image: {image_number}")  # Display the full path
+                                    st.write("Time: ", img_time)  # Display the time
+
+                            # Save the results in session state to persist them across refreshes
+                            st.session_state.nearby_images = nearby_image_paths  # Now this will work
+                    with col_3:
+
+
 
     if all_data:
         df = pd.DataFrame(all_data)
