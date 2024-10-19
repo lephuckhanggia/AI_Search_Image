@@ -34,7 +34,7 @@ DB_List = [DB_FULL_FINAL, DB_L01_L22, DB_L23,DB_L24, DB_L25, DB_L26, DB_L27, DB_
 csv_folder_path = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\CSV_0.1"
 parent_path = r"C:\AI Chalenge 2024\Data 2024\KeyFrames_0.1"
 result_path = r'D:\LePhucKhangGia\AI_Chanllenge_2024\AI_Search_Image\Result'
-
+video_folder_path = r'D:\LePhucKhangGia\AI_Chanllenge_2024\VIDEO_FULL'
 # Set up page layout
 st.markdown(
     """
@@ -149,17 +149,28 @@ with st.sidebar:
     Answer_Select = st.selectbox("Chosse QA or KIS answer", options=Answer_list)
     body = Answer_Select
     if st.button("SUBMIT RESULT"):
+        if Answer_Select == "KIS Answer":
+            # Call the function and check the result
+            response = submit_kis_answer()
 
-        # Call the function and check the result
-        response = submit_kis_answer()
+            # Step 5: Check the server's response
+            if response.status_code == 200:
+                st.write("KIS answer submitted successfully!")
+                st.write(response.json())
+            else:
+                st.write(f"Failed to submit KIS answer, status code: {response.status_code}")
+                st.write(response.text)
+        if Answer_Select == "QA Answer":
+            # Call the function and check the result
+            response = submit_qa_answer()
 
-        # Step 5: Check the server's response
-        if response.status_code == 200:
-            st.write("KIS answer submitted successfully!")
-            st.write(response.json())
-        else:
-            st.write(f"Failed to submit KIS answer, status code: {response.status_code}")
-            st.write(response.text)
+            # Step 5: Check the server's response
+            if response.status_code == 200:
+                st.write("QA answer submitted successfully!")
+                st.write(response.json())
+            else:
+                st.write(f"Failed to submit QA answer, status code: {response.status_code}")
+                st.write(response.text)
         st.write(QA_Answer_Structure)
         st.write(Video_Answer)
         st.write(Time_ms_Answer)
@@ -178,7 +189,7 @@ if results:
 
     with image_col_container:
         # Columns for image and list display
-        image_col, list_image_col = st.columns([0.7, 0.3])
+        image_col, list_image_col = st.columns([0.8, 0.2])
 
         for idx, (image_id, distance) in enumerate(zip(results['ids'][0], results['distances'][0])):
             image_path = os.path.join(parent_path, image_id)
@@ -188,6 +199,20 @@ if results:
             filenum = int(filename_without_extension)
             directory_name = os.path.basename(os.path.dirname(image_path))
             csv_file_path = os.path.join(csv_folder_path, f'{directory_name}.csv')
+
+            # Extract the "L01" part from the image path
+            folder_num = directory_name  # This will be something like 'L01'
+
+            # Extract the "L25" part from the image path's directory (e.g., L25 from L25_V072)
+            folder_num = directory_name.split('_')[0]  # This will get 'L25'
+
+            # Construct the video folder path based on the parent video path (e.g., Videos_L25_a)
+            video_folder_num = f"Videos_{folder_num}_a"
+            video_directory = os.path.join(video_folder_path, video_folder_num, 'video')
+
+            # The video filename should be just the video name (e.g., L25_V072.mp4)
+            video_filename = f"{video_name}.mp4"
+            video_path = os.path.join(video_directory, video_filename)
 
             data = []
             if os.path.exists(csv_file_path):
@@ -208,7 +233,7 @@ if results:
             with image_col:
                 if os.path.exists(image_path):
                     st.image(image_path, caption=os.path.basename(image_path))
-                    col_1, col_2,col_3 = st.columns([0.4, 0.3,0.2])
+                    col_1, col_2,col_3 = st.columns([0.4, 0.4,0.2])
 
                     with col_1:
                         st.write(idx + 1,  "Num: ",image_num)
@@ -292,7 +317,13 @@ if results:
                             # Save the results in session state to persist them across refreshes
                             st.session_state.nearby_images = nearby_image_paths  # Now this will work
                     with col_3:
-
+                        # Add a button to show the video of the current image
+                        if st.button(f"Show Video {idx + 1}", key=f"video_button_{idx + 1}"):
+                            with image_col:
+                                if os.path.exists(video_path):
+                                    st.video(video_path)  # Display the video if the path is valid
+                                else:
+                                    st.write(f"Video not found: {video_path}")
 
 
     if all_data:
