@@ -14,7 +14,7 @@ db_path = 0
 
 # Submission API Info
 session_id = "8Bws8LMNQ7vWfiEDTdxTZpxmI3mhKFTP"
-evaluation_id = "bec3b699-bdea-4f2c-94ae-61ee065fa76e"  # The active evaluationID you retrieved
+evaluation_id = "69ec2262-d829-4ac1-94a2-1aa0a6693266"  # The active evaluationID you retrieved
 url = f"https://eventretrieval.one/api/v2/submit/{evaluation_id}"
 
 
@@ -33,7 +33,7 @@ DB_List = [DB_FULL_FINAL, DB_L01_L22, DB_L23,DB_L24, DB_L25, DB_L26, DB_L27, DB_
 
 csv_folder_path = r"D:\LePhucKhangGia\AI_Chanllenge_2024\Final\CSV_0.1"
 parent_path = r"C:\AI Chalenge 2024\Data 2024\KeyFrames_0.1"
-result_path = r'D:\LePhucKhangGia\AI_Chanllenge_2024\AI_Search_Image\Result'
+result_path = r'D:\LePhucKhangGia\AI_Chanllenge_2024\Final\Result'
 video_folder_path = r'D:\LePhucKhangGia\AI_Chanllenge_2024\VIDEO_FULL'
 # Set up page layout
 st.markdown(
